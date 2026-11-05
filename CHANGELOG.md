@@ -30,5 +30,8 @@ and Undertow EE 2.0.2.Final (Undertow core 2.4.3.Final).
   Jetty. `@PreDestroy` methods can use the `ServletContext` (and `Environment` lookups that
   read its init parameters), `ServletContextListener#contextDestroyed` is called on destroy
   rather than on stop, a stopped server can be started again, and calling `destroy()` more
-  than once is tolerated.
+  than once is tolerated. A server that is started again after a graceful shutdown handles
+  requests again instead of rejecting them with `503`. This happens, for example, when
+  Spring Framework 7 pauses and restarts a cached test context: pausing stops the child
+  context of a separate management server.
 - **Configuration metadata:** property metadata is generated for IDE completion.

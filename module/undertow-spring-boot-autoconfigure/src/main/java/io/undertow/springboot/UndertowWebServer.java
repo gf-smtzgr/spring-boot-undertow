@@ -111,6 +111,9 @@ public class UndertowWebServer implements WebServer {
                 if (this.undertow == null) {
                     this.undertow = createUndertowServer();
                 }
+                else {
+                    resetGracefulShutdown();
+                }
                 this.undertow.start();
                 this.started = true;
                 String message = getStartedLogMessage();
@@ -131,6 +134,21 @@ public class UndertowWebServer implements WebServer {
                     destroySilently();
                 }
             }
+        }
+    }
+
+    /**
+     * Resets the {@link GracefulShutdownHandler} when an existing Undertow instance is
+     * started again (e.g. after the application context was stopped and restarted). A
+     * graceful shutdown initiated before the stop otherwise leaves the handler in its
+     * shutdown state, and every request after the restart is rejected with
+     * {@code HTTP 503}. Leftover shutdown listeners are released with {@code false};
+     * the callback they refer to has already been cleared by {@link #stop()}.
+     */
+    private void resetGracefulShutdown() {
+        GracefulShutdownHandler gracefulShutdown = this.gracefulShutdown;
+        if (gracefulShutdown != null) {
+            gracefulShutdown.start();
         }
     }
 
